@@ -13,8 +13,8 @@ let otp = "";
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'laxman.testing01@gmail.com',
-    pass: 'ifmiovsexhkogyqg'
+    user: process.env.USER,
+    pass: process.env.PASS
   }
 });
 
@@ -81,8 +81,10 @@ app.post("/login", function(req, res) {
     if (user) {
       if (user.password === passWord) {
         console.log("login Successfull");
+        res.redirect("/authenticated");
       } else {
         console.log("wrong password");
+        res.redirect("/login");
       }
     } else {
       console.log(err);
@@ -99,14 +101,14 @@ app.post("/forgot-password", function(req, res) {
     email: req.body.email
   }).then(function(user, err) {
     if (user) {
-      res.send("User matched");
-      otp = otpGenerator.generate(6,{usserCaseAlphabets:false, specialChars: false, lowerCaseAlphabets:false});
+      res.sendFile(__dirname + "/otp.html");
+      otp = otpGenerator.generate(6,{upperCaseAlphabets:false, specialChars: false, lowerCaseAlphabets:false});
       var mailOptions = {
         from: 'youremail@gmail.com',
-        to: 'laxman22072003@gmail.com',
-        subject: 'Sending Email using Node.js',
-        text: 'Helo There',
-        html: "hello" + otp, // html body
+        to: req.body.email,
+        subject: 'OTP for Password Reset',
+        text: 'Hello There',
+        html: "hello,<br> Please find OTP to login to your account: <br>" + otp, // html body
       };
       transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
@@ -119,6 +121,20 @@ app.post("/forgot-password", function(req, res) {
       res.send("user not found, register first");
     }
   });
+});
+
+app.post("/auth",function(req,res){
+  if(otp === req.body.otp){
+    console.log("Login Successfull");
+    res.redirect("/authenticated");
+  } else {
+    console.log("Entered OTP is incorrect");
+    res.redirect("/forgot-password");
+  }
+});
+
+app.get("/authenticated",function(req,res){
+  res.sendFile(__dirname + "/inside.html");
 });
 
 app.listen(3000, function() {

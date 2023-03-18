@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+*{
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container{
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  align-items: center;
+}
+
+.row{
+  background-color: #c9c9e1;
+  padding: 20px 40px 80px 40px;
+  border-radius: 10px;
+}
+
+.card-body{
+  padding-top: 20px;
+}
+
+.card-body input{
+  margin-top: 20px;
+  padding: 15px 50px;
+  border-radius: 100px
+}
+
+.card-body button{
+  display: flex;;
+  justify-content: center;
+  padding: 10px 15px;
+  border-radius: 20px;
+  margin-left: 120px;
+  margin-top: 30px;
+  background-color: #73a5f5;
+  color: white;
+}
+
+.forget_password{
+  margin: 110px;
+  text-decoration: none;
+}
