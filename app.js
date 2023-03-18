@@ -3,8 +3,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const encrypt = require('mongoose-encryption');
+const nodemailer = require('nodemailer');
+const otpGenerator = require('otp-generator');
 
 const app = express();
+
+let otp = "";
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'laxman.testing01@gmail.com',
+    pass: 'ifmiovsexhkogyqg'
+  }
+});
+
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({
@@ -24,7 +37,10 @@ const userSchema = new mongoose.Schema({
 });
 
 var secret = process.env.SOME_LONG_UNGUESSABLE_STRING;
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ['password'] });
+userSchema.plugin(encrypt, {
+  secret: secret,
+  encryptedFields: ['password']
+});
 
 const User = new mongoose.model("User", userSchema);
 
@@ -62,20 +78,47 @@ app.post("/login", function(req, res) {
   User.findOne({
     username: userName
   }).then(function(user, err) {
-      if(user){
-        if(user.password === passWord){
-          console.log("login Successfull");
-        } else {
-          console.log("wrong password");
-        }
+    if (user) {
+      if (user.password === passWord) {
+        console.log("login Successfull");
       } else {
-        console.log(err);
+        console.log("wrong password");
       }
+    } else {
+      console.log(err);
+    }
   });
 });
 
-app.get("/forgot-password",function(req,res){
+app.get("/forgot-password", function(req, res) {
   res.sendFile(__dirname + "/forgot.html");
+});
+
+app.post("/forgot-password", function(req, res) {
+  User.findOne({
+    email: req.body.email
+  }).then(function(user, err) {
+    if (user) {
+      res.send("User matched");
+      otp = otpGenerator.generate(6,{usserCaseAlphabets:false, specialChars: false, lowerCaseAlphabets:false});
+      var mailOptions = {
+        from: 'youremail@gmail.com',
+        to: 'laxman22072003@gmail.com',
+        subject: 'Sending Email using Node.js',
+        text: 'Helo There',
+        html: "hello" + otp, // html body
+      };
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    } else {
+      res.send("user not found, register first");
+    }
+  });
 });
 
 app.listen(3000, function() {
