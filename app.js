@@ -81,7 +81,7 @@ app.post("/login", function(req, res) {
     if (user) {
       if (user.password === passWord) {
         console.log("login Successfull");
-        res.redirect("/authenticated");
+        res.redirect("/auth");
       } else {
         console.log("wrong password");
         res.redirect("/login");
